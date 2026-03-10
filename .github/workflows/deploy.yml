@@ -1,0 +1,44 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - v4
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 切换到项目目录
+            cd /root/quartz
+
+            # 拉取最新代码
+            git fetch origin v4
+            git reset --hard origin/v4
+
+            # 安装依赖（如果 package.json 发生变化）
+            npm install --production
+
+            # 构建项目
+            npx quartz build
+
+            # 检查服务是否已在 PM2 中运行，若未运行则启动，若已运行则重启
+            if pm2 list | grep -q "quartz-medical"; then
+              pm2 restart "quartz-medical"
+            else
+              pm2 start "npx quartz build --serve --port 6066" --name "quartz-medical"
+            fi
+            
+            # 保存 PM2 状态以确保重启后自动加载
+            pm2 save
