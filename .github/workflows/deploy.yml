@@ -42,7 +42,7 @@ jobs:
             if pm2 list | grep -q "quartz-medical"; then
               pm2 restart "quartz-medical"
             else
-              pm2 start "npx quartz build --serve --port 6066 --host 0.0.0.0" --name "quartz-medical"
+              pm2 start "npx quartz build --serve --port 6066" --name "quartz-medical"
             fi
             
             pm2 save
