@@ -24,6 +24,15 @@ export default ((opts?: Options) => {
             </li>
           ))}
         </ul>
+        <div style={{ marginTop: "10px", fontSize: "14px", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "15px" }}>
+          <a href="https://beian.miit.gov.cn/" target="_blank" style={{ color: "var(--lightgray)", textDecoration: "none" }}>
+            粤ICP备2026023313号-1
+          </a>
+          <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030002011147" target="_blank" style={{ color: "var(--lightgray)", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+            <img src="/static/beian.png" style={{ width: "14px", height: "14px", marginRight: "4px" }} alt="公安备案图标" />
+            粤公网安备44030002011147号
+          </a>
+        </div>
       </footer>
     )
   }
