@@ -42,6 +42,7 @@ export const defaultContentPageLayout: PageLayout = {
   ],
   right: [
     Component.Graph(),
+    Component.DesktopOnly(Component.Donate()), // 改成这一行
     Component.DesktopOnly(Component.TableOfContents()),
     Component.Backlinks(),
   ],
