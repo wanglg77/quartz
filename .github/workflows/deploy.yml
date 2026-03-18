@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "public/*"
-          target: "/root/quartz-web"
+          target: "/root/quartz"
           strip_components: 1
 
       - name: Refresh Server
