@@ -6,43 +6,44 @@ on:
       - v4
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 1. 在 GitHub 云端完成高负载任务
+      - name: Build Project
+        run: |
+          npm install
+          npx quartz build
+
+      # 2. 仅传输生成的静态网页文件 (public 文件夹)
+      - name: Deploy static files via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
-          debug: true
+          source: "public/*"
+          target: "/root/quartz-web" # 建议换个专门存网页的路径
+          strip_components: 1
+
+      # 3. 如果需要重启服务（或者直接用 Nginx 指向该目录）
+      - name: Refresh Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # 确保环境变量生效
-            export PATH=$PATH:/usr/local/bin:/usr/bin:/bin
-            
-            # 切换到项目目录
-            cd /root/quartz
-
-            # 拉取最新代码
-            git fetch origin v4
-            git reset --hard origin/v4
-
-            # 安装依赖
-            npm install --production
-
-            # 构建项目
-            npx quartz build
-
-            # 启动/重启服务
-            if pm2 list | grep -q "quartz-medical"; then
-              pm2 restart "quartz-medical"
-            else
-              pm2 start "npx quartz build --serve --port 6066" --name "quartz-medical"
-            fi
-            
-            pm2 save
+            # 如果你用 PM2 挂载，只需重启一次即可，甚至不需要重新 build
+            pm2 restart "quartz-medical" || pm2 start "npx quartz build --serve --port 6066" --name "quartz-medical"
