@@ -22,6 +22,8 @@ jobs:
       # 1. 在 GitHub 云端完成高负载任务
       - name: Build Project
         run: |
+	  # 强制更新 npm 到符合要求的最新版本
+          npm install -g npm@latest
           npm install
           npx quartz build
 
