@@ -22,6 +22,7 @@ title: "医质管共享知识库首页"
 
 ### 关联网站
 狼叔的医质管空间: http://byl-hqm.cn
+RCA genius: http://rca.jsmedtech.cn
 
 
 ---
