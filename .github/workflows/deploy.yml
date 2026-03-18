@@ -43,4 +43,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            pm2 restart "quartz-medical" || pm2 start "npx quartz build --serve --port 6066" --name "quartz-medical"
+            pm2 restart "quartz-medical" 
