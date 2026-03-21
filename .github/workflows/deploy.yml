@@ -1,4 +1,4 @@
-name: Deploy to Server
+name: Deploy Quartz to Nginx
 
 on:
   push:
@@ -21,7 +21,6 @@ jobs:
 
       - name: Build Project
         run: |
-          npm install -g npm@latest
           npm install
           npx quartz build
 
@@ -33,16 +32,15 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "public/*"
-          target: "/root/quartz/public"
+          target: "/var/www/quartz" # 对应上面 Nginx 的 root
           strip_components: 1
+          overwrite: true
+          # 部署前清理旧文件，防止乱码文件残留
+          rm_prev_nodes: true
 
-      - name: Refresh Server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            # 直接托管已经传过去的静态文件夹，不再 build
-            pm2 serve /root/quartz/public 6066 --name "quartz-medical"
-            pm2 save
+      - name: Baidu API Submission
+        # 只有在部署成功后才通知百度
+        run: |
+          cd public
+          find . -name "*.html" | sed 's|^\.|https://docs.byl-hqm.cn|' > urls.txt
+          curl -H 'Content-Type:text/plain' --data-binary @urls.txt "http://data.zz.baidu.com/urls?site=https://docs.byl-hqm.cn&token=${{ secrets.BAIDU_TOKEN }}"
