@@ -30,6 +30,7 @@
 .explorer {
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: hidden;
 
   min-height: 1.2rem;
@@ -114,6 +115,7 @@ button.desktop-explorer {
 .explorer-content {
   list-style: none;
   overflow: hidden;
+  overflow-x: hidden;
   overflow-y: auto;
   margin-top: 0.5rem;
 
@@ -126,14 +128,26 @@ button.desktop-explorer {
       overscroll-behavior: contain;
     }
 
-    & li > a {
-      color: var(--dark);
-      opacity: 0.75;
-      pointer-events: all;
+    & li {
+      margin: 0.2rem 0;
+      
+      // 文章链接的悬挂缩进
+      & > a {
+        color: var(--dark);
+        opacity: 0.75;
+        pointer-events: all;
+        display: inline-block;
+        line-height: 1.4;
+        padding-left: 1.4rem; // 为左侧留出空间（模拟文件夹图标的宽度）
+        text-indent: -1.4rem; 
+        width: 100%;
+        box-sizing: border-box;
+        word-break: break-all;
 
-      &.active {
-        opacity: 1;
-        color: var(--tertiary);
+        &.active {
+          opacity: 1;
+          color: var(--tertiary);
+        }
       }
     }
   }
@@ -161,55 +175,48 @@ button.desktop-explorer {
 }
 
 .folder-container {
-  flex-direction: row;
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start; // 图标顶对齐
   user-select: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 0.4rem;
 
-  & div > a {
+  & > div {
+    flex: 1;
+    min-width: 0; // 核心：允许容器缩小以触发换行
+  }
+
+  & button.folder-button {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    cursor: pointer;
+    display: block;
+  }
+
+  & span.folder-title {
     color: var(--secondary);
     font-family: var(--headerFont);
     font-size: 0.95rem;
     font-weight: $semiBoldWeight;
-    line-height: 1.5rem;
-    display: inline-block;
-  }
-
-  & div > a:hover {
-    color: var(--tertiary);
-  }
-
-  & div > button {
-    color: var(--dark);
-    background-color: transparent;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    padding-left: 0;
-    padding-right: 0;
-    display: flex;
-    align-items: center;
-    font-family: var(--headerFont);
-
-    & span {
-      font-size: 0.95rem;
-      display: inline-block;
-      color: var(--secondary);
-      font-weight: $semiBoldWeight;
-      margin: 0;
-      line-height: 1.5rem;
-      pointer-events: none;
-    }
+    line-height: 1.4;
+    display: block;
+    word-break: break-all;
   }
 }
 
 .folder-icon {
-  margin-right: 5px;
+  flex-shrink: 0;
+  margin-top: 0.3rem; // 垂直居中于第一行文字
   color: var(--secondary);
-  cursor: pointer;
   transition: transform 0.3s ease;
   backface-visibility: visible;
-  flex-shrink: 0;
 }
 
 li:has(> .folder-outer:not(.open)) > .folder-container > svg {
